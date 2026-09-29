@@ -17,10 +17,17 @@ export async function mockMongo(): Promise<IMockMongo> {
 
 	// CI already starts MongoDB. Use it instead of mongodb-memory-server,
 	// whose default 5.0.x binary needs OpenSSL 1.1 (not present on Ubuntu 24.04).
+	// Use a unique database per helper call so mocha files cannot see each other's jobs.
 	if (externalUri) {
-		log('using external mongo', externalUri);
-		self.mongo = await MongoClient.connect(externalUri);
-		self.uri = externalUri;
+		const url = new URL(externalUri);
+		const baseName = decodeURIComponent(url.pathname.replace(/^\//, '')) || 'agenda-test';
+		url.pathname = `/${baseName}-${process.pid}-${Date.now().toString(36)}-${Math.random()
+			.toString(36)
+			.slice(2, 8)}`;
+		const uri = url.toString();
+		log('using external mongo', uri);
+		self.mongo = await MongoClient.connect(uri);
+		self.uri = uri;
 		self.disconnect = function () {
 			self.mongo.close();
 		};
