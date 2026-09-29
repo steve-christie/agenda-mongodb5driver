@@ -1,7 +1,7 @@
 {
   "name": "@hokify/agenda",
   "version": "6.3.0",
-  "description": "Light weight job scheduler for Node.js",
+  "description": "Fork of @hokify/agenda with MongoDB Node.js driver v5 compatibility",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
@@ -11,10 +11,11 @@
     "dist"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=14.20.1"
   },
   "scripts": {
     "release": "npm run build && standard-version",
+    "prepare": "npm run build",
     "prepublishOnly": "npm run build",
     "build": "tsc",
     "test": "npm run mocha",
@@ -35,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hokify/agenda"
+    "url": "git://github.com/steve-christie/agenda-mongodb5driver"
   },
   "keywords": [
     "job",
@@ -48,7 +49,7 @@
   "author": "Simon Tretter <simon.tretter@hokify.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hokify/agenda/issues"
+    "url": "https://github.com/steve-christie/agenda-mongodb5driver/issues"
   },
   "dependencies": {
     "cron-parser": "^4",
@@ -56,7 +57,7 @@
     "debug": "~4",
     "human-interval": "~2",
     "luxon": "^3",
-    "mongodb": "^4"
+    "mongodb": "^5"
   },
   "devDependencies": {
     "eslint": "^8.29.0",
