@@ -1002,7 +1002,7 @@ describe('Job', () => {
 			await Promise.all([agenda.now('lock job', { i: 1 }), agenda.now('lock job', { i: 2 })]);
 
 			// give it some time to get picked up
-			await delay(500);
+			await delay(200);
 
 			expect((await agenda.getRunningStats()).lockedJobs).to.equal(1);
 		});

@@ -77,7 +77,7 @@ export class JobProcessor {
 		};
 	}
 
-	private nextScanAt = new Date();
+	private nextScanAt: Date;
 
 	private jobQueue: JobProcessingQueue = new JobProcessingQueue(this.agenda);
 
@@ -102,6 +102,9 @@ export class JobProcessor {
 		private processEvery: number
 	) {
 		log('creating interval to call processJobs every [%dms]', processEvery);
+		// On-the-fly locking requires nextRunAt < nextScanAt. The first process()
+		// below is not awaited, so nextScanAt must already be in the future.
+		this.nextScanAt = new Date(Date.now() + processEvery);
 		this.processInterval = setInterval(() => this.process(), processEvery);
 		this.process();
 	}
