@@ -1606,12 +1606,13 @@ describe('Job', () => {
 
 	it('should not run job if is has been removed', async () => {
 		let executed = false;
-		agenda.define('test', async () => {
+		const jobName = 'removed-job-should-not-run';
+		agenda.define(jobName, async () => {
 			executed = true;
 		});
 
 		const job = new Job(agenda, {
-			name: 'test',
+			name: jobName,
 			type: 'normal'
 		});
 		job.schedule('in 1 second');
@@ -1623,12 +1624,12 @@ describe('Job', () => {
 		let retried = 0;
 		// wait till it's locked (Picked up by the event processor)
 		do {
-			jobStarted = await agenda.db.getJobs({ name: 'test' });
-			if (!jobStarted[0].lockedAt) {
-				delay(100);
+			jobStarted = await agenda.db.getJobs({ name: jobName });
+			if (!jobStarted[0]?.lockedAt) {
+				await delay(100);
 			}
 			retried++;
-		} while (!jobStarted[0].lockedAt || retried > 10);
+		} while (!jobStarted[0]?.lockedAt && retried <= 50);
 
 		expect(jobStarted[0].lockedAt).to.exist; // .equal(null);
 
@@ -1646,14 +1647,14 @@ describe('Job', () => {
 			new Promise<void>(resolve => {
 				setTimeout(() => {
 					resolve();
-				}, 1000);
+				}, 5000);
 			}),
 			completed
 		]);
 
 		expect(executed).to.be.equal(false);
 		assert.ok(typeof error !== 'undefined');
-		expect(error.message).to.includes('(name: test) cannot be updated in the database');
+		expect(error.message).to.includes(`(name: ${jobName}) cannot be updated in the database`);
 	});
 
 	describe('job fork mode', () => {

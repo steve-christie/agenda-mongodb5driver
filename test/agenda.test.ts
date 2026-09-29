@@ -89,6 +89,12 @@ describe('Agenda', () => {
 			});
 		});
 		describe('mongo', () => {
+			it('uses MongoDB Node.js driver v5', () => {
+				// eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+				const { version } = require('mongodb/package.json') as { version: string };
+				expect(version.split('.')[0]).to.equal('5');
+			});
+
 			it('sets the _db directly', () => {
 				const agenda = new Agenda();
 				agenda.mongo(mongoDb);
@@ -98,6 +104,12 @@ describe('Agenda', () => {
 			it('returns itself', async () => {
 				const agenda = new Agenda();
 				expect(await agenda.mongo(mongoDb)).to.equal(agenda);
+			});
+
+			it('accepts a MongoDB driver v5 Db instance and collection name', async () => {
+				const agenda = new Agenda();
+				expect(await agenda.mongo(mongoDb, 'scheduler_jobs')).to.equal(agenda);
+				expect(agenda.db.collection.collectionName).to.equal('scheduler_jobs');
 			});
 		});
 
@@ -337,18 +349,14 @@ describe('Agenda', () => {
 						job2.attrs.nextRunAt!.toISOString()
 					);
 
-					mongoDb
+					const jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(1);
-						});
+					expect(jobs).to.have.length(1);
 				});
 
 				it('should not modify job when unique matches and insertOnly is set to true', async () => {
@@ -390,18 +398,14 @@ describe('Agenda', () => {
 
 					expect(job1.attrs.nextRunAt!.toISOString()).to.equal(job2.attrs.nextRunAt!.toISOString());
 
-					mongoDb
+					const jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(1);
-						});
+					expect(jobs).to.have.length(1);
 				});
 			});
 
@@ -438,18 +442,14 @@ describe('Agenda', () => {
 						.schedule(time)
 						.save();
 
-					mongoDb
+					const jobs = await mongoDb
 						.collection('agendaJobs')
 						.find({
 							name: 'unique job'
 						})
-						.toArray((err, jobs) => {
-							if (err) {
-								throw err;
-							}
+						.toArray();
 
-							expect(jobs).to.have.length(2);
-						});
+					expect(jobs).to.have.length(2);
 				});
 			});
 		});

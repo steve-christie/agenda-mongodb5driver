@@ -9,11 +9,23 @@
   A light-weight job scheduling library for Node.js
 </p>
 
-This was originally a fork of agenda.js,
+## About this fork
+
+This repository is a fork of [`@hokify/agenda`](https://github.com/hokify/agenda).
+
+Its purpose is to keep the upstream Agenda API and behaviour, while depending on the MongoDB Node.js driver **v5.x** instead of v4.x. That allows applications already using driver v5 (for example via Mongoose 7) to pass an existing `Db` instance into `agenda.mongo()` without a TypeScript type mismatch:
+
+```ts
+await agenda.mongo(mongoose.connection.db, 'scheduler_jobs');
+```
+
+This is a driver-compatibility fork, not a separate Agenda implementation. If you want the original project, use the upstream repository: [https://github.com/hokify/agenda](https://github.com/hokify/agenda).
+
+The upstream `@hokify/agenda` package was originally a fork of agenda.js,
 it differs from the original version in following points:
 
 - Complete rewrite in Typescript (fully typed!)
-- mongodb4 driver (supports mongodb 5.x)
+- MongoDB Node.js driver v5.x
 - Supports mongoDB sharding by name
 - touch() can have an optional progress parameter (0-100)
 - Bugfixes and improvements for locking & job processing (concurrency, lockLimit,..)
@@ -74,7 +86,11 @@ _Kudos for making the comparison chart goes to [Bull](https://www.npmjs.com/pack
 
 # Installation
 
-Install via NPM
+This fork is not published as the upstream `@hokify/agenda` package. Install it from this repository, for example:
+
+    npm install github:steve-christie/agenda-mongodb5driver
+
+To use the original package instead:
 
     npm install @hokify/agenda
 
